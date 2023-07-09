@@ -21,7 +21,7 @@ class Book(models.Model):
     contributors = models.ManyToManyField('Contributor', through="BookContributor")
 
     def __str__(self):
-        return self.title
+        return "{} ({})".format(self.title, self.isbn)
 
 class Contributor(models.Model):
     """
@@ -31,8 +31,15 @@ class Contributor(models.Model):
     last_names = models.CharField(max_length=50, help_text="The contributor's last name or names.")
     email = models.EmailField(help_text="The contact email for the contributor.")
 
+    def initialled_name(self):
+        """ obj.first_names='Jerome David', obj.last_names='Salinger'
+            => 'Salinger, JD' """
+        initials = ''.join([name[0] for name in \
+                            self.first_names.split(' ')])
+        return "{}, {}".format(self.last_names, initials)
+
     def __str__(self):
-        return self.first_names
+        return self.initialled_name()
 
 class BookContributor(models.Model):
     class ContributorRole(models.TextChoices):

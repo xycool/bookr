@@ -15,6 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# print(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -31,7 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'apps.ReviewsAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -40,7 +41,14 @@ INSTALLED_APPS = [
     'reviews',
 ]
 
+INSTALLED_APPS += [
+    'django_extensions',
+    'debug_toolbar'
+]
+
+
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,12 +58,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# for debug_toolbar
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,3 +140,25 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+try:
+    import jupyterlab # jupyterlab
+    NOTEBOOK_DEFAULT_URL = '/lab'  # Using JupyterLab
+except ImportError:
+    NOTEBOOK_DEFAULT_URL = '/tree'  # Using Jupyter
+
+NOTEBOOK_DIR = str(BASE_DIR / "notebooks")
+
+NOTEBOOK_ARGUMENTS = [
+    '--ip', '0.0.0.0',
+    '--port', '8888',
+    '--notebook-dir', NOTEBOOK_DIR,
+    '--NotebookApp.default_url', NOTEBOOK_DEFAULT_URL,
+]
+IPYTHON_KERNEL_DISPLAY_NAME = 'Django Kernel'
+import os
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+# DJANGO_ALLOW_AYNSC_UNSAFE = True
+# if you want to use Chrome by default
+# os.environ.setdefault('BROWSER', 'google-chrome')
